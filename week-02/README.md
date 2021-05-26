@@ -37,3 +37,36 @@ func main() {
     }
 }
 ```
+
+## comment
+
+虽然基本逻辑的最终含义差不多，但是有更优雅的实现方式，另外在错误码的定义上，会更建议传自定义的业务错误码出去。
+
+对 not found 和其他错误进行转换成自定义错误常量，这样上层业务可以与sql层解耦。
+使用 wrapf 对错误进行包装, 上层用 errors.Is 判断错误.
+
+可参考：
+dao:
+```go
+return errors.Wrapf(code.NotFound, fmt.Sprintf("sql: %s error: %v", sql, err))
+```
+
+如果dao是其他错误
+
+```go
+return errors.Wrapf(code.Internal, fmt.Sprintf("sql: %s error: %v", sql, err))
+```
+
+biz:
+
+```go
+if errors.Is(err, code.NotFound} {
+
+}
+```
+
+## 答疑直播
+
+参考 kratos error.go 实现
+
+业务层不应该依赖底层的错误类型，包装为 自定义 notfind 类型

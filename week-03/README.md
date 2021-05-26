@@ -57,6 +57,8 @@ func serve(addr string, handler http.Handler, notify []os.Signal, sgc chan os.Si
 		for sg := range sgc {
 			switch sg {
 			case syscall.SIGQUIT:
+			case syscall.SIGTERM:
+			case syscall.SIGINT:
 				s.Shutdown(context.Background())
 			default:
 			}
@@ -83,3 +85,7 @@ func serveDebug(notify []os.Signal, sgc chan os.Signal, stop <-chan struct{}) er
 	return serve("127.0.0.1:8001", http.DefaultServeMux, notify, sgc, stop)
 }
 ```
+
+## comment
+
+基本正确，信号量的处理需要针对：syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT。
